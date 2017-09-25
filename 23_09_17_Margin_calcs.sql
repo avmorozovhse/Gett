@@ -47,9 +47,9 @@ SELECT
   fcdo.Cost_Exc_Vat * -1 +
     CASE WHEN fo.customer_total_cost_inc_vat > fo.driver_total_cost_inc_vat + fcdo.Cost_Exc_Vat * -1
       THEN
-        (fo.customer_total_cost_inc_vat - fo.driver_total_cost_inc_vat - fcdo.Cost_Exc_Vat * -1) / 1.18
+        (fo.customer_total_cost_inc_vat - fo.driver_total_cost_inc_vat - fcdo.Cost_Inc_Vat * -1) / 1.18
       ELSE
-        (fo.customer_total_cost_inc_vat - fo.driver_total_cost_inc_vat - fcdo.Cost_Exc_Vat * -1) / 1.00 END as margin_sum
+        (fo.customer_total_cost_inc_vat - fo.driver_total_cost_inc_vat - fcdo.Cost_Inc_Vat * -1) / 1.00 END as margin_sum
 from dbo.Dwh_Fact_Orders_V fo
   INNER JOIN dbo.Dwh_Fact_Charging_Drivers_Orders_V fcdo on fcdo.Order_GK = fo.Order_GK
   INNER JOIN dbo.dwh_dim_charging_components_v dcc on fcdo.Component_Key = dcc.Component_Key
@@ -59,7 +59,6 @@ WHERE fo.Date_Key >= '2017-05-01'
       and fo.Country_Key = 2
       and not(fo.Ride_Type_Key = 2)
       and fo.Order_Status_Key = 7
-
 
 
 
