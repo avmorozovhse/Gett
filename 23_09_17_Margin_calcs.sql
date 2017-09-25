@@ -1,5 +1,4 @@
 --Version v1, Alex Morozov's code
-
 SELECT
   fo.Order_GK,
   fo.Riding_User_GK,
@@ -29,35 +28,42 @@ WHERE dcc.Component_Name_Key = 4
   and fo.Date_Key < '2017-08-14'
   
   
+  
+  
+  
 --Version v2, Alex Morozov's code
 SELECT
-  dl.Region_Name,
+  fo.Order_GK,
+  fo.Riding_User_GK as User_GK,
+  fo.M_Ride_Duration,
+  fo.Customer_Total_Cost_Inc_Vat,
+  fo.Driver_Total_Cost_Inc_Vat,
+  fo.Order_Confirmed_Datetime,
   dct.Class_Type_Group_Desc,
-  count(fo.Order_GK) as Num,
-  AVG(fcdo.Cost_Exc_Vat * -1 +
-    CASE WHEN fo.customer_total_cost_inc_vat > fo.driver_total_cost_inc_vat
+  fo.Cancelled_By_Type_Key,
+  fo.Date_Key,
+  fo.Ordering_Corporate_Account_GK as Corporate_Account_GK,
+  fcdo.Cost_Exc_Vat* -1 as Commission,
+  fcdo.Cost_Exc_Vat * -1 +
+    CASE WHEN fo.customer_total_cost_inc_vat > fo.driver_total_cost_inc_vat + fcdo.Cost_Exc_Vat * -1
       THEN
-        (fo.customer_total_cost_inc_vat - fo.driver_total_cost_inc_vat) / 1.18
+        (fo.customer_total_cost_inc_vat - fo.driver_total_cost_inc_vat - fcdo.Cost_Exc_Vat * -1) / 1.18
       ELSE
-        (fo.customer_total_cost_inc_vat - fo.driver_total_cost_inc_vat) / 1.00 END) as margin_sum
+        (fo.customer_total_cost_inc_vat - fo.driver_total_cost_inc_vat - fcdo.Cost_Exc_Vat * -1) / 1.00 END as margin_sum
 from dbo.Dwh_Fact_Orders_V fo
   INNER JOIN dbo.Dwh_Fact_Charging_Drivers_Orders_V fcdo on fcdo.Order_GK = fo.Order_GK
   INNER JOIN dbo.dwh_dim_charging_components_v dcc on fcdo.Component_Key = dcc.Component_Key
   INNER JOIN dbo.dwh_dim_class_types_v dct ON dct.class_type_key = fo.class_type_key
-  INNER JOIN dbo.dwh_dim_locations_v dl ON dl.location_key = fo.origin_location_key
-WHERE fo.Date_Key > '2017-08-01'
+WHERE fo.Date_Key >= '2017-05-01'
       and dcc.Component_Name_Key = 4
       and fo.Country_Key = 2
-      and fo.origin_location_key IN (245, 246)
-      and dct.Class_Type_Group_Key in (1,3,4,5)
-GROUP BY dl.Region_Name, dct.Class_Type_Group_Desc
-ORDER BY dl.Region_Name, margin_sum
+      and not(fo.Ride_Type_Key = 2)
+      and fo.Order_Status_Key = 7
 
 
 
 
 --Version v1, Dima's code
-
 SELECT
   fo.order_gk,
   fo.customer_total_cost_inc_vat,
