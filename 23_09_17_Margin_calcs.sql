@@ -45,7 +45,7 @@ SELECT
   fo.Ordering_Corporate_Account_GK as Corporate_Account_GK,
   fcdo.Cost_Exc_Vat* -1 as Commission,
   fcdo.Cost_Exc_Vat * -1 +
-    CASE WHEN fo.customer_total_cost_inc_vat > fo.driver_total_cost_inc_vat + fcdo.Cost_Exc_Vat * -1
+    CASE WHEN fo.customer_total_cost_inc_vat > fo.driver_total_cost_inc_vat + fcdo.Cost_Inc_Vat * -1
       THEN
         (fo.customer_total_cost_inc_vat - fo.driver_total_cost_inc_vat - fcdo.Cost_Inc_Vat * -1) / 1.18
       ELSE
